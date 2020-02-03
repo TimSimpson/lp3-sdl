@@ -10,8 +10,8 @@
 //          * The majority of these wrapped types have implicit conversions to
 //            the pointers they wrap, allowing them to be used when calling
 //            SDL functions.
-//          * However these types "own" a resource (in the gsl::owner sense)
-//            and should not be copied. Instead references should be passed.
+//          * However these types "own" a resource and should not be copied.
+//            Instead references should be passed.
 //          * There is however a default constructor for these which sets the
 //            underlying pointer to nullptr. These resources can be assigned
 //            to from a not null pointer; however after that they can never be
@@ -33,8 +33,6 @@
 #include <optional>
 #include <stdexcept>
 
-#include <gsl/gsl>
-
 #include "sdl/config.hpp"
 #include <SDL.h>
 #include <SDL_image.h>
@@ -55,17 +53,6 @@ struct LP3_SDL_API SDL2 {
 // -/
 
 
-class SdlException : public virtual std::runtime_error
-{
-    inline explicit SdlException(const std::string& what_arg)
-    :   runtime_error(what_arg)
-    {}
-
-    inline explicit SdlException(const char* what_arg)
-    :   runtime_error(what_arg)
-    {}
-};
-
 /*
 	Template which checks to see if a resource is nullptr on creation and
 	calls a deleter function on destruction.
@@ -77,8 +64,7 @@ public:
     : ptr(_ptr)
     {
         if (!ptr) {
-            LP3_LOG_ERROR(SDL_GetError());
-            LP3_THROW2(lp3::core::Exception, "Couldn't create resource");
+            throw std::logic_error(SDL_GetError());
         }
     }
 
@@ -117,7 +103,7 @@ public:
         return ptr;
     }
 private:
-    gsl::owner<ResourceTypePtr> ptr;
+    ResourceTypePtr ptr;
 };
 
 // ----------------------------------------------------------------------------
@@ -139,10 +125,10 @@ using GLContext = SdlAutoDeletedResource<SDL_GLContext, SDL_GL_DeleteContext>;
 // NOTE: Currently this breaks the default behavior of SDL_assert afterwards
 //       (asserts causes failures but it won't trigger a breakpoint) even
 //       though it looks correct according to the docs, so only use it in tests.
-class SdlAssertCalled : public virtual SdlException {
+class SdlAssertCalled : public virtual std::runtime_error {
 public:
-	inline SdlAssertCalled()
-    :   SdlException("SDL_Assert triggered")
+	inline explicit SdlAssertCalled()
+    :   runtime_error("SDL_Assert triggered")
     {}
 };
 
@@ -183,7 +169,7 @@ class LP3_SDL_API RWops {
 public:
 	RWops();
 
-	RWops(gsl::owner<SDL_RWops *> ops);
+	RWops(SDL_RWops * ops);
 
 	~RWops();
 
@@ -262,7 +248,7 @@ public:
         SDL_assert(1 == result);
     }
 private:
-	gsl::owner<SDL_RWops *> ops;
+	SDL_RWops * ops;
 };
 
 // ~end-doc

@@ -8,16 +8,10 @@
 #include <lp3/sdl.hpp>
 #include <lp3/main.hpp>
 
-
-namespace core = lp3::core;
 namespace sdl = lp3::sdl;
 
-
-int _main(core::PlatformLoop & loop) {
+int _main(lp3::main::PlatformLoop & loop) {
     sdl::SDL2 sdl2(SDL_INIT_VIDEO);
-
-    core::LogSystem log;
-    core::MediaManager media;
 
     SDL_Log("Hello SDL!");
 
@@ -36,7 +30,24 @@ int _main(core::PlatformLoop & loop) {
 
     SDL_Log("Loading texture...");
 
-    sdl::RWops png_file = media.load("core/Earth.png");
+    #if defined(__EMSCRIPTEN__)
+        const std::string file("Earth.png");
+    #else
+        if (loop.command_line_args().size() < 2) {
+            SDL_Log("Expected picture for arg 2");
+            return 1;
+        }
+        const std::string file = loop.command_line_args()[1];
+    #endif
+
+    SDL_RWops * ptr = SDL_RWFromFile(file.c_str(), "rb");
+    if (!ptr) {
+        SDL_Log("Error opening file %s.", file.c_str());
+        SDL_Log("SDL error %s.", SDL_GetError());
+        return 1;
+    }
+
+    sdl::RWops png_file{ptr};
     sdl::Surface bitmap = IMG_LoadTyped_RW(png_file, 0, "PNG");
 
     // Here's an alternative way to load the bitmap:

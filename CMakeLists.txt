@@ -88,27 +88,30 @@ install(TARGETS lp3_sdl EXPORT Lp3_Sdl-targets
     INCLUDES DESTINATION include
 )
 
-add_library(lp3::core ALIAS lp3_sdl)
+add_library(lp3::sdl ALIAS lp3_sdl)
 install(EXPORT Lp3_Sdl-targets
     FILE Lp3_Sdl-targets.cmake
     NAMESPACE lp3::
     DESTINATION lib/cmake/Lp3_Sdl
 )
 
-file(WRITE "${PROJECT_BINARY_DIR}/Lp3_Sdl-config.cmake" "
+file(WRITE "${PROJECT_BINARY_DIR}/Lp3_SdlConfig.cmake" "
 include(CMakeFindDependencyMacro)
-find_dependency(sdl2)
+if (NOT \"\${CMAKE_SYSTEM_NAME}\" MATCHES \"Emscripten\")
+    find_dependency(sdl2)
+    find_dependency(sdl2_image)
+endif()
 include(\"\${CMAKE_CURRENT_LIST_DIR}/Lp3_Sdl-targets.cmake\")
 ")
 
-write_basic_package_version_file("${PROJECT_BINARY_DIR}/Lp3_Sdl-config-version.cmake"
+write_basic_package_version_file("${PROJECT_BINARY_DIR}/Lp3_SdlConfigVersion.cmake"
     VERSION 1.0.1
     COMPATIBILITY AnyNewerVersion
 )
 
 install(FILES
-    "${PROJECT_BINARY_DIR}/Lp3_Sdl-config.cmake"
-    "${PROJECT_BINARY_DIR}/Lp3_Sdl-config-version.cmake"
+    "${PROJECT_BINARY_DIR}/Lp3_SdlConfig.cmake"
+    "${PROJECT_BINARY_DIR}/Lp3_SdlConfigVersion.cmake"
     DESTINATION lib/cmake/Lp3_Sdl
 )
 
@@ -122,28 +125,8 @@ if (NOT is_child)
 endif()
 
 if (LP3_SDL_FULL)
-    add_executable(Sdl2Simple WIN32
-                   ${CMAKE_CURRENT_SOURCE_DIR}/demos/Sdl2Simple.cpp)
-    target_link_libraries(Sdl2Simple lp3_sdl)
-    if ("${CMAKE_SYSTEM_NAME}" MATCHES "Emscripten")
-        set_target_properties(Sdl2Simple PROPERTIES
-            SUFFIX ".html"
-            LINK_FLAGS "--emrun"
-        )
-        target_link_options(Sdl2Simple PRIVATE
-            "SHELL:--preload-file ${CMAKE_CURRENT_SOURCE_DIR}/ci/media@/"
-        )
-    endif()
-
-
     if (LP3_SETUP_FOLDERS)
-        set_target_properties (lp3_sdl PROPERTIES FOLDER core)
-        set_target_properties (Sdl2Simple PROPERTIES FOLDER core)
-    endif()
-    if(BUILD_SHARED_LIBS)
-        if (MSVC)
-            target_compile_options(Sdl2Simple PRIVATE /wd4251 /wd4275)
-        endif()
+        set_target_properties (lp3_sdl PROPERTIES FOLDER lp3_sdl)
     endif()
 endif()
 

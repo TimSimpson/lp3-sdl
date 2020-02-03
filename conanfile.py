@@ -36,23 +36,23 @@ class Lp3Sdl(conans.ConanFile):
         "src/*", "include/*", "demos/*", "tests/*", "CMakeLists.txt"
     )
 
-    def build(self):
+    def _configed_cmake(self):
         cmake = conans.CMake(self)
         cmake.configure(defs={
             "CMAKE_FIND_PACKAGE_PREFER_CONFIG":"TRUE",
         })
+        return cmake
+
+    def build(self):
+        cmake = self._configed_cmake()
         cmake.build()
         # If SDL2 is shared, we won't be able to find it in most cases.
         if self.settings.os != "Emscripten" and not self.options.shared:
             cmake.test()
 
     def package(self):
-        self.copy("*.hpp", dst="include", src="src")
-        self.copy("*.lib", dst="lib", keep_path=False)
-        self.copy("*.dll", dst="bin", keep_path=False)
-        self.copy("*.dylib*", dst="lib", keep_path=False)
-        self.copy("*.so", dst="lib", keep_path=False)
-        self.copy("*.a", dst="lib", keep_path=False)
+        cmake = self._configed_cmake()
+        cmake.install()
 
     def package_info(self):
         self.cpp_info.libs = ["lp3_sdl"]

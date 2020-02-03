@@ -37,7 +37,7 @@ RWops::RWops()
 {}
 
 LP3_SDL_API
-RWops::RWops(gsl::owner<SDL_RWops *> _ops)
+RWops::RWops(SDL_RWops * _ops)
 :	ops(_ops)
 {
 	SDL_assert(nullptr != _ops);
