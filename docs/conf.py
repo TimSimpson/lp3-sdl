@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Configuration file for the Sphinx documentation builder.
-project = 'Lp3-Core'
+project = 'Lp3-Sdl'
 copyright = '2020, Tim Simpson'
 author = 'Tim Simpson'
 
@@ -21,19 +21,19 @@ exclude_patterns = []
 pygments_style = 'monokai'
 html_theme = 'traditional'
 html_static_path = ['_static']
-htmlhelp_basename = 'Lp3-Coredoc'
+htmlhelp_basename = 'Lp3-Sdldoc'
 latex_elements = {
 }
 latex_documents = [
-    (master_doc, 'Lp3-Core.tex', 'Lp3-Core Documentation',
+    (master_doc, 'Lp3-Sdl.tex', 'Lp3-Sdl Documentation',
      'Tim Simpson', 'manual'),
 ]
 man_pages = [
-    (master_doc, 'lp3-core', 'Lp3-Core Documentation',
+    (master_doc, 'lp3-sdl', 'Lp3-Sdl Documentation',
      [author], 1)
 ]
 texinfo_documents = [
-    (master_doc, 'Lp3-Core', 'Lp3-Core Documentation',
-     author, 'Lp3-Core', 'One line description of project.',
+    (master_doc, 'Lp3-Sdl', 'Lp3-Sdl Documentation',
+     author, 'Lp3-Sdl', 'One line description of project.',
      'Miscellaneous'),
 ]
