@@ -7,7 +7,9 @@ class TestPackage(conans.ConanFile):
     settings = "os", "compiler", "build_type", "arch"
 
     requires = (
+# ~end-doc
          "Lp3-Main/1.0.1@TimSimpson/testing",
+# ~start-doc
          "Lp3-Sdl/1.0.1@TimSimpson/testing"
     )
 

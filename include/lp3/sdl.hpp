@@ -161,9 +161,6 @@ inline void close_rwops(SDL_RWops * ops) {
 //
 //      A few extra functions are added which read and write directly into
 //      POD object references.
-//
-//      lp3::core::MediaManager's `load` and `save` methods return instances
-//      of RWops.
 // ----------------------------------------------------------------------------
 class LP3_SDL_API RWops {
 public:

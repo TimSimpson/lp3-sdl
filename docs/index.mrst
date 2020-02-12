@@ -3,14 +3,53 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Lp3-Core
+Lp3-SDL
 <<<<<<<<
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   ./core.mrst
+~dumpfile "../README.md" 1
+
+
+Build Info and Options
+----------------------
+
+To use this from Conan, add the [BinCrafters](https://bintray.com/bincrafters) and [Richter repository](https://bintray.com/timsimpson/richter) as follows:
+
+.. code-block:: bash
+
+~dumpfile "../ci/cpp/conan/travis/install.sh" start_after ="# ~start-doc add-conan-repos" end_before="# ~end-doc" indent=4
+
+
+Then create a simple Conan file like so:
+
+.. code-block:: python
+
+~dumpfile "../test_package/conanfile.py" indent = 4 end_before = "# ~end-doc"
+
+~dumpfile "../test_package/conanfile.py" indent = 4 start_after = "# ~start-doc"
+
+
+If you're using CMake (and seriously if you're using this library that'd be the only reason why) you can then add a call to ``find_package(Lp3_Sdl)`` to your CMake file to bring the necessary targets into your script. Here's an example:
+
+.. code-block:: cmake
+
+~dumpfile "../test_package/CMakeLists.txt" section = "=" start_after = "# ~start-doc cmake-example" end_before = "# ~end-doc cmake-example" indent = 4
+
+
+Reference
+---------
+
+::lp3::sdl
+~~~~~~~~~~
+
+The following components live in the ``::lp3::sdl`` namespace (unless they're macros).
+They can be brought in by including ``lp3/sdl.hpp``.
+
+~dumpfile "../include/lp3/sdl.hpp" section = "~" start_after = "// ~end-doc summary"
+
 
 :ref:`search`
 
