@@ -192,10 +192,10 @@ public:
 	}
 
     template<typename T>
-    inline void read(T & dst) {
+    inline bool read(T & dst) {
         static_assert(std::is_pod<T>::value, "Type must be POD.");
         const auto result = read(reinterpret_cast<char *>(&dst), sizeof(T));
-        SDL_assert(1 == result);
+        return 1 == result;
     }
 
 	template<typename T>
