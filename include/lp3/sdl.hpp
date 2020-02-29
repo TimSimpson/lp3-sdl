@@ -35,7 +35,6 @@
 
 #include "sdl/config.hpp"
 #include <SDL.h>
-#include <SDL_image.h>
 
 
 namespace lp3::sdl {

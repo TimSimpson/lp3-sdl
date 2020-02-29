@@ -19,12 +19,23 @@ target_link_libraries(Sdl2Simple PUBLIC lp3::lp3_sdl)
 target_link_libraries(Sdl2Simple PUBLIC lp3::lp3_main)
 
 
-if ("${CMAKE_SYSTEM_NAME}" MATCHES "Emscripten")
+if (NOT "${CMAKE_SYSTEM_NAME}" MATCHES "Emscripten")
+    find_package(sdl2_image 2.0.5 REQUIRED)
+    target_link_libraries(Sdl2Simple
+        PUBLIC sdl2_image::sdl2_image
+    )
+else()
+    target_compile_options(Sdl2Simple PUBLIC
+        "SHELL:-s USE_SDL_IMAGE=2"
+        "SHELL:-s SDL2_IMAGE_FORMATS=[\"png\",\"bmp\"]"
+    )
     set_target_properties(Sdl2Simple PROPERTIES
         SUFFIX ".html"
         LINK_FLAGS "--emrun"
     )
     target_link_options(Sdl2Simple PRIVATE
+        "SHELL:-s USE_SDL_IMAGE=2"
+        "SHELL:-s SDL2_IMAGE_FORMATS=[\"png\",\"bmp\"]"
         "SHELL:--preload-file ${CMAKE_CURRENT_SOURCE_DIR}/media@/"
     )
 endif()

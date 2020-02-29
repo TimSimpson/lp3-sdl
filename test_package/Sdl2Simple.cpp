@@ -7,11 +7,13 @@
 #include <memory>
 #include <lp3/sdl.hpp>
 #include <lp3/main.hpp>
+#include <SDL_image.h>
 
 namespace sdl = lp3::sdl;
 
 int _main(lp3::main::PlatformLoop & loop) {
     sdl::SDL2 sdl2(SDL_INIT_VIDEO);
+    IMG_Init(IMG_INIT_PNG);
 
     SDL_Log("Hello SDL!");
 

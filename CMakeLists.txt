@@ -18,7 +18,6 @@ endif()
 
 if (NOT "${CMAKE_SYSTEM_NAME}" MATCHES "Emscripten")
     find_package(sdl2 2.0.9 MODULE REQUIRED)
-    find_package(sdl2_image 2.0.5 REQUIRED)
 endif()
 
 add_library(lp3_sdl
@@ -59,18 +58,13 @@ endif()
 if (NOT "${CMAKE_SYSTEM_NAME}" MATCHES "Emscripten")
     target_link_libraries(lp3_sdl
         PUBLIC sdl2::sdl2
-               sdl2_image::sdl2_image
     )
 else()
     target_compile_options(lp3_sdl PUBLIC
         "SHELL:-s USE_SDL=2"
-        "SHELL:-s USE_SDL_IMAGE=2"
-        "SHELL:-s SDL2_IMAGE_FORMATS=[\"png\",\"bmp\"]"
     )
     target_link_options(lp3_sdl PUBLIC
         "SHELL:-s USE_SDL=2"
-        "SHELL:-s USE_SDL_IMAGE=2"
-        "SHELL:-s SDL2_IMAGE_FORMATS=[\"png\",\"bmp\"]"
     )
 endif()
 
