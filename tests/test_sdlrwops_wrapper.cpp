@@ -1,10 +1,11 @@
 #include <lp3/sdl.hpp>
+#include <algorithm>
 #include <string>
 #include <vector>
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-TEST_CASE("Test RWOPs wrappers", "[read_a_file]") {
+TEST_CASE("RWops read", "[read_a_file]") {
     const std::string text("Hi, how's it going?");
 
     lp3::sdl::RWops rwops(SDL_RWFromConstMem(text.data(), text.size()));
@@ -46,6 +47,55 @@ TEST_CASE("Test RWOPs wrappers", "[read_a_file]") {
         // Won't work a second time
         const auto result2 = rwops.read_optional<Rest>();
         REQUIRE(! (bool) result2);
+    }
+
+    {
+        rwops.seek_from_beginning(1);
+        const auto i = rwops.read_optional<char>();
+        REQUIRE((bool) i);
+        REQUIRE('i' == *i);
+    }
+
+    {
+        rwops.seek_from_end(-1);
+        const auto q = rwops.read_optional<char>();
+        REQUIRE((bool) q);
+        REQUIRE('?' == *q);
+    }
+
+}
+
+
+TEST_CASE("RWops write", "[write_a_file]") {
+    std::string text(40, '*');
+
+    lp3::sdl::RWops rwops(SDL_RWFromMem(text.data(), text.size()));
+
+    {
+        std::string new_text("Good day.");
+        const auto result = rwops.write(new_text.data(), new_text.size());
+        REQUIRE(1 == result);
+        REQUIRE(text == "Good day.*******************************");
+    }
+
+    {
+        #pragma pack(1)
+        struct WeirdStruct {
+            std::int8_t number;
+            char word[5];
+            std::int64_t big_number;
+        };
+        #pragma pack()
+
+        WeirdStruct weird_struct;
+        weird_struct.number = 65;  // 'a'
+        std::string hello("HELLO");
+        std::copy(hello.begin(), hello.end(), weird_struct.word);
+        weird_struct.big_number = 0x21756f7920656573;  // "see you!"
+
+        const auto result = rwops.write(weird_struct);
+        REQUIRE(1 == result);
+        REQUIRE(text == "Good day.AHELLOsee you!*****************");
     }
 }
 // ~end-doc

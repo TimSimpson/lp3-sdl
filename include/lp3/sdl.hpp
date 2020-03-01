@@ -238,10 +238,10 @@ public:
 	}
 
     template<typename T>
-    inline void write(const T & n) {
+    inline std::size_t write(const T & n) {
         static_assert(std::is_pod<T>::value, "Type must be POD.");
         const auto result = write(reinterpret_cast<const char *>(&n), sizeof(T));
-        SDL_assert(1 == result);
+        return result;
     }
 private:
 	SDL_RWops * ops;
