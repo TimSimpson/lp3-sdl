@@ -14,6 +14,7 @@ class TestPackage(conans.ConanFile):
     )
 
     sdl2_requires = (
+        "sdl2/2.0.9@bincrafters/stable",
         "sdl2_image/2.0.5@bincrafters/stable",
     )
 
