@@ -2,19 +2,35 @@
 # LP3_SDL
 #       Handles very rudimentary, basic stuff all the other libs need.
 # *********************************************************************
-project(Lp3_Sdl CXX)
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
-include(CMakePackageConfigHelpers)
 
-enable_testing()
+if(NOT DEFINED PROJECT_NAME)
+  set(NOT_SUBPROJECT ON)
+endif()
+
+project(Lp3_Sdl CXX)
+
+include(CTest)
+include(CMakePackageConfigHelpers)
 
 include("${CMAKE_BINARY_DIR}/conan_paths.cmake"
         OPTIONAL
         RESULT_VARIABLE using_conan)
-
+if (NOT using_conan)
+    include("${CMAKE_MODULE_PATH}/conan_paths.cmake"
+        OPTIONAL
+        RESULT_VARIABLE using_conan)
+endif()
 if(using_conan)
+    # If a module creates and exports CMake package configs, this will let us
+    # find them instead of the "Find" package scripts Conan generates for the
+    # majority of packages which won't otherwise work.
     set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 endif()
+
+# Allow user to ask explicitly to build tests
+option(LP3_SDL_Build_Tests "Build tests when BUILD_TESTING is enabled." ${NOT_SUBPROJECT})
+
 
 if (NOT "${CMAKE_SYSTEM_NAME}" MATCHES "Emscripten")
     find_package(sdl2 2.0.9 MODULE REQUIRED)
@@ -93,7 +109,6 @@ file(WRITE "${PROJECT_BINARY_DIR}/Lp3_SdlConfig.cmake" "
 include(CMakeFindDependencyMacro)
 if (NOT \"\${CMAKE_SYSTEM_NAME}\" MATCHES \"Emscripten\")
     find_dependency(sdl2)
-    find_dependency(sdl2_image)
 endif()
 include(\"\${CMAKE_CURRENT_LIST_DIR}/Lp3_Sdl-targets.cmake\")
 ")
@@ -112,6 +127,25 @@ install(FILES
 # *********************************************************************
 # Tests and Drivers / Demos
 # *********************************************************************
+
+if (BUILD_TESTING AND LP3_SDL_Build_Tests)
+    find_package(Catch2 CONFIG REQUIRED)
+
+    function(make_test exe_target)
+        if("${CMAKE_SYSTEM_NAME}" MATCHES "Emscripten")
+            add_test(NAME "test_${exe_target}" COMMAND node
+                                                       $<TARGET_FILE:${exe_target}>)
+        else()
+            add_test(NAME "test_${exe_target}" COMMAND ${exe_target})
+        endif()
+    endfunction()
+
+    add_executable(sdlrwops_wrapper
+                   ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_sdlrwops_wrapper.cpp)
+    target_link_libraries(sdlrwops_wrapper lp3_sdl Catch2::Catch2)
+    make_test(sdlrwops_wrapper)
+
+endif()
 
 get_directory_property(is_child PARENT_DIRECTORY)
 if (NOT is_child)
