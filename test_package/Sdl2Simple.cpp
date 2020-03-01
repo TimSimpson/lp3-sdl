@@ -2,12 +2,12 @@
 // This example shows using `lp3::sdl`'s helper classes to create
 // a simple app.
 // --------------------------------------------------------------------
+#include <SDL_image.h>
 #include <fstream>
 #include <iostream>
-#include <memory>
-#include <lp3/sdl.hpp>
 #include <lp3/main.hpp>
-#include <SDL_image.h>
+#include <lp3/sdl.hpp>
+#include <memory>
 
 namespace sdl = lp3::sdl;
 
@@ -18,29 +18,24 @@ int _main(lp3::main::PlatformLoop & loop) {
     SDL_Log("Hello SDL!");
 
     sdl::Window window = SDL_CreateWindow(
-        "SDL2",
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
-        640,
-        480,
-        SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE
-    );
+            "SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480,
+            SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
     SDL_Log("Creating renderer...");
     sdl::Renderer renderer
-        = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+            = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     SDL_Log("Loading texture...");
 
-    #if defined(__EMSCRIPTEN__)
-        const std::string file("Earth.png");
-    #else
-        if (loop.command_line_args().size() < 2) {
-            SDL_Log("Expected picture for arg 2");
-            return 1;
-        }
-        const std::string file = loop.command_line_args()[1];
-    #endif
+#if defined(__EMSCRIPTEN__)
+    const std::string file("Earth.png");
+#else
+    if (loop.command_line_args().size() < 2) {
+        SDL_Log("Expected picture for arg 2");
+        return 1;
+    }
+    const std::string file = loop.command_line_args()[1];
+#endif
 
     SDL_RWops * ptr = SDL_RWFromFile(file.c_str(), "rb");
     if (!ptr) {

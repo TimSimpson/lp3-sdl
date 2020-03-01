@@ -1,5 +1,5 @@
-#include <lp3/sdl.hpp>
 #include <algorithm>
+#include <lp3/sdl.hpp>
 #include <string>
 #include <vector>
 #define CATCH_CONFIG_MAIN
@@ -24,7 +24,7 @@ TEST_CASE("RWops read", "[read_a_file]") {
     }
 
     {
-        struct Hows{
+        struct Hows {
             char text[5];
         } hows;
 
@@ -35,36 +35,34 @@ TEST_CASE("RWops read", "[read_a_file]") {
     }
 
     {
-        struct Rest{
+        struct Rest {
             char text[10];
         };
 
         const auto result = rwops.read_optional<Rest>();
-        REQUIRE((bool) result);
+        REQUIRE((bool)result);
         std::string expected(" it going?");
         REQUIRE(std::string_view(result->text, 10) == expected);
 
         // Won't work a second time
         const auto result2 = rwops.read_optional<Rest>();
-        REQUIRE(! (bool) result2);
+        REQUIRE(!(bool)result2);
     }
 
     {
         rwops.seek_from_beginning(1);
         const auto i = rwops.read_optional<char>();
-        REQUIRE((bool) i);
+        REQUIRE((bool)i);
         REQUIRE('i' == *i);
     }
 
     {
         rwops.seek_from_end(-1);
         const auto q = rwops.read_optional<char>();
-        REQUIRE((bool) q);
+        REQUIRE((bool)q);
         REQUIRE('?' == *q);
     }
-
 }
-
 
 TEST_CASE("RWops write", "[write_a_file]") {
     std::string text(40, '*');
@@ -79,19 +77,19 @@ TEST_CASE("RWops write", "[write_a_file]") {
     }
 
     {
-        #pragma pack(1)
+#pragma pack(1)
         struct WeirdStruct {
             std::int8_t number;
             char word[5];
             std::int64_t big_number;
         };
-        #pragma pack()
+#pragma pack()
 
         WeirdStruct weird_struct;
-        weird_struct.number = 65;  // 'a'
+        weird_struct.number = 65; // 'a'
         std::string hello("HELLO");
         std::copy(hello.begin(), hello.end(), weird_struct.word);
-        weird_struct.big_number = 0x21756f7920656573;  // "see you!"
+        weird_struct.big_number = 0x21756f7920656573; // "see you!"
 
         const auto result = rwops.write(weird_struct);
         REQUIRE(1 == result);

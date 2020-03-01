@@ -36,7 +36,6 @@
 #include "sdl/config.hpp"
 #include <SDL.h>
 
-
 namespace lp3::sdl {
 
 // ----------------------------------------------------------------------------
@@ -51,30 +50,22 @@ struct LP3_SDL_API SDL2 {
 };
 // -/
 
-
 /*
-	Template which checks to see if a resource is nullptr on creation and
-	calls a deleter function on destruction.
+        Template which checks to see if a resource is nullptr on creation and
+        calls a deleter function on destruction.
  */
-template<typename ResourceTypePtr, void(*Deleter)(ResourceTypePtr)>
+template <typename ResourceTypePtr, void (*Deleter)(ResourceTypePtr)>
 class SdlAutoDeletedResource {
-public:
-	SdlAutoDeletedResource(ResourceTypePtr _ptr)
-    : ptr(_ptr)
-    {
+  public:
+    SdlAutoDeletedResource(ResourceTypePtr _ptr) : ptr(_ptr) {
         if (!ptr) {
             throw std::logic_error(SDL_GetError());
         }
     }
 
-	SdlAutoDeletedResource()
-		: ptr(nullptr)
-	{
-	}
+    SdlAutoDeletedResource() : ptr(nullptr) {}
 
-    SdlAutoDeletedResource(SdlAutoDeletedResource && rvalue)
-    :  ptr(rvalue.ptr)
-    {
+    SdlAutoDeletedResource(SdlAutoDeletedResource && rvalue) : ptr(rvalue.ptr) {
         rvalue.ptr = nullptr;
     }
 
@@ -84,24 +75,23 @@ public:
         }
     }
 
-	SdlAutoDeletedResource & operator=(SdlAutoDeletedResource && rvalue)
-	{
-		SDL_assert(nullptr == ptr);
-		if (this->ptr != rvalue.ptr) {
-			this->ptr = rvalue.ptr;
-			rvalue.ptr = nullptr;
-		}
-		return *this;
-	}
-	SdlAutoDeletedResource & operator=(const SdlAutoDeletedResource & other)
-		= delete;
+    SdlAutoDeletedResource & operator=(SdlAutoDeletedResource && rvalue) {
+        SDL_assert(nullptr == ptr);
+        if (this->ptr != rvalue.ptr) {
+            this->ptr = rvalue.ptr;
+            rvalue.ptr = nullptr;
+        }
+        return *this;
+    }
+    SdlAutoDeletedResource & operator=(const SdlAutoDeletedResource & other)
+            = delete;
 
-
-    operator ResourceTypePtr () {
-		SDL_assert(nullptr != ptr);
+    operator ResourceTypePtr() {
+        SDL_assert(nullptr != ptr);
         return ptr;
     }
-private:
+
+  private:
     ResourceTypePtr ptr;
 };
 
@@ -118,34 +108,30 @@ using Texture = SdlAutoDeletedResource<SDL_Texture *, SDL_DestroyTexture>;
 using GLContext = SdlAutoDeletedResource<SDL_GLContext, SDL_GL_DeleteContext>;
 // ~end-doc
 
-
 // Use these two classes to make the SDL_assert calls throw exceptions
 // instead to test that code properly triggers them.
 // NOTE: Currently this breaks the default behavior of SDL_assert afterwards
 //       (asserts causes failures but it won't trigger a breakpoint) even
 //       though it looks correct according to the docs, so only use it in tests.
 class SdlAssertCalled : public virtual std::runtime_error {
-public:
-	inline explicit SdlAssertCalled()
-    :   runtime_error("SDL_Assert triggered")
-    {}
+  public:
+    inline explicit SdlAssertCalled() : runtime_error("SDL_Assert triggered") {}
 };
 
 class LP3_SDL_API SdlAssertToExceptionConverter {
-public:
-	SdlAssertToExceptionConverter();
+  public:
+    SdlAssertToExceptionConverter();
 
-	~SdlAssertToExceptionConverter();
+    ~SdlAssertToExceptionConverter();
 
-private:
+  private:
     SDL_AssertionHandler old_handler;
 };
 
-
 inline void close_rwops(SDL_RWops * ops) {
-	SDL_assert(nullptr != ops);
-	auto result = ops->close(ops);
-	SDL_assert(0 == result);
+    SDL_assert(nullptr != ops);
+    auto result = ops->close(ops);
+    SDL_assert(0 == result);
 }
 
 // ----------------------------------------------------------------------------
@@ -162,93 +148,92 @@ inline void close_rwops(SDL_RWops * ops) {
 //      POD object references.
 // ----------------------------------------------------------------------------
 class LP3_SDL_API RWops {
-public:
-	RWops();
+  public:
+    RWops();
 
-	RWops(SDL_RWops * ops);
+    RWops(SDL_RWops * ops);
 
-	~RWops();
+    ~RWops();
 
-	RWops(RWops && rhs);
+    RWops(RWops && rhs);
 
-	RWops & operator=(RWops && rvalue);
+    RWops & operator=(RWops && rvalue);
 
-	RWops & operator=(const RWops & other) = delete;
+    RWops & operator=(const RWops & other) = delete;
 
-	// Implicitly convert to SDL_RWops
-	inline operator SDL_RWops * () {
-		SDL_assert(nullptr != ops);
-		return ops;
-	}
+    // Implicitly convert to SDL_RWops
+    inline operator SDL_RWops *() {
+        SDL_assert(nullptr != ops);
+        return ops;
+    }
 
-	inline std::size_t read(void * dst, std::size_t object_size,
-		                    std::size_t object_count = 1) {
-		SDL_assert(nullptr != ops);
-		// object_size is the size of an object to be read-
-		// object_count is the number of objects to read. If things work
-		// exactly as expected object_count is what's returned.
-		return ops->read(ops, dst, object_size, object_count);
-	}
+    inline std::size_t read(void * dst, std::size_t object_size,
+                            std::size_t object_count = 1) {
+        SDL_assert(nullptr != ops);
+        // object_size is the size of an object to be read-
+        // object_count is the number of objects to read. If things work
+        // exactly as expected object_count is what's returned.
+        return ops->read(ops, dst, object_size, object_count);
+    }
 
-    template<typename T>
-    inline bool read(T & dst) {
+    template <typename T> inline bool read(T & dst) {
         static_assert(std::is_pod<T>::value, "Type must be POD.");
         const auto result = read(reinterpret_cast<char *>(&dst), sizeof(T));
         return 1 == result;
     }
 
-	template<typename T>
-	inline std::optional<T> read_optional() {
-		static_assert(std::is_pod<T>::value, "Type must be POD.");
-		char data[sizeof(T)];
-		const auto result = read(data, sizeof(T));
-		if (1 == result) {
+    template <typename T> inline std::optional<T> read_optional() {
+        static_assert(std::is_pod<T>::value, "Type must be POD.");
+        char data[sizeof(T)];
+        const auto result = read(data, sizeof(T));
+        if (1 == result) {
             // This is less terse than it could be to get around a
             // strict-aliasing related warning in GCC in release mode.
             T * const copy_ptr = reinterpret_cast<T *>(data);
             T copy = *copy_ptr;
             return copy;
-		} else {
-			return std::nullopt;
-		}
-	}
+        } else {
+            return std::nullopt;
+        }
+    }
 
-	inline std::int64_t seek(std::int64_t offset, int whence=RW_SEEK_CUR) {
-		SDL_assert(nullptr != ops);
-		return ops->seek(ops, offset, whence);
-	}
+    inline std::int64_t seek(std::int64_t offset, int whence = RW_SEEK_CUR) {
+        SDL_assert(nullptr != ops);
+        return ops->seek(ops, offset, whence);
+    }
 
-	inline std::int64_t seek_from_beginning(std::int64_t offset) {
-		return seek(offset, RW_SEEK_SET);
-	}
+    inline std::int64_t seek_from_beginning(std::int64_t offset) {
+        return seek(offset, RW_SEEK_SET);
+    }
 
-	inline std::int64_t seek_from_end(std::int64_t offset) {
-		return seek(offset, RW_SEEK_END);
-	}
+    inline std::int64_t seek_from_end(std::int64_t offset) {
+        return seek(offset, RW_SEEK_END);
+    }
 
-	inline std::int64_t size() {
-		SDL_assert(nullptr != ops);
-		return ops->size(ops);
-	}
+    inline std::int64_t size() {
+        SDL_assert(nullptr != ops);
+        return ops->size(ops);
+    }
 
-	inline std::size_t write(const void * src, std::size_t object_count,
-							 std::size_t object_size = 1) {
-		SDL_assert(nullptr != ops);
-		return ops->write(ops, src, object_count, object_size);
-	}
+    inline std::size_t write(const void * src, std::size_t object_count,
+                             std::size_t object_size = 1) {
+        SDL_assert(nullptr != ops);
+        return ops->write(ops, src, object_count, object_size);
+    }
 
-    template<typename T>
-    inline std::size_t write(const T & n) {
+    template <typename T> inline std::size_t write(const T & n) {
         static_assert(std::is_pod<T>::value, "Type must be POD.");
-        const auto result = write(reinterpret_cast<const char *>(&n), sizeof(T));
+        const auto result
+                = write(reinterpret_cast<const char *>(&n), sizeof(T));
         return result;
     }
-private:
-	SDL_RWops * ops;
+
+  private:
+    SDL_RWops * ops;
 };
 
 // ~end-doc
 
-}
+} // namespace lp3::sdl
 
 #endif
