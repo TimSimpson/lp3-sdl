@@ -31,6 +31,11 @@ option(LP3_SDL_Build_Tests "Build tests when BUILD_TESTING is enabled."
        ${NOT_SUBPROJECT})
 
 if(NOT "${CMAKE_SYSTEM_NAME}" MATCHES "Emscripten")
+    # Note: I'm on Windows right now. If I don't put MODULE here, the code will
+    # pull in the target SDL2::SDL2-static, and NOT "sdl2::sdl2". But later,
+    # when test_package tries to use the installed config file, it will call
+    # `find_package(sdl2)` and pull in a version which only has the target
+    # `sdl2::sdl2`!
     find_package(sdl2 2.0.9 MODULE REQUIRED)
 endif()
 
@@ -64,8 +69,20 @@ if(BUILD_SHARED_LIBS)
     endif()
 endif()
 
+# Stupid Conan can't just name the effing libraries the same as the rest of the
+# world. Check it out:
+# https://docs.conan.io/en/latest/integrations/build_system/cmake/find_packages.html
+# https://www.reddit.com/r/cpp/comments/bsjr6r/how_to_nonintrusively_try_the_conan_package/
 if(NOT "${CMAKE_SYSTEM_NAME}" MATCHES "Emscripten")
-    target_link_libraries(lp3_sdl PUBLIC sdl2::sdl2)
+    if (TARGET sdl2::sdl2)
+        target_link_libraries(lp3_sdl PUBLIC sdl2::sdl2)
+    elseif (TARGET SDL2::SDL2)
+        target_link_libraries(lp3_sdl PUBLIC SDL2::SDL2)
+    elseif(TARGET SDL2::SDL2-static)
+        target_link_libraries(lp3_sdl PUBLIC SDL2::SDL2-static)
+    else()
+        message(FATAL_ERROR "Could not find target SDL2::SDL2 or SDL2::SDL2-static!")
+    endif()
 else()
     target_compile_options(lp3_sdl PUBLIC "SHELL:-s USE_SDL=2")
     target_link_options(lp3_sdl PUBLIC "SHELL:-s USE_SDL=2")
