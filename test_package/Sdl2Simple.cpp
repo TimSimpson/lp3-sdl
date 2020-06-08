@@ -4,41 +4,38 @@
 // --------------------------------------------------------------------
 #include <fstream>
 #include <iostream>
-#include <memory>
-#include <lp3/sdl.hpp>
 #include <lp3/main.hpp>
+#include <lp3/sdl.hpp>
+#include <memory>
+#include <SDL_image.h>
 
 namespace sdl = lp3::sdl;
 
 int _main(lp3::main::PlatformLoop & loop) {
     sdl::SDL2 sdl2(SDL_INIT_VIDEO);
+    IMG_Init(IMG_INIT_PNG);
 
     SDL_Log("Hello SDL!");
 
     sdl::Window window = SDL_CreateWindow(
-        "SDL2",
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
-        640,
-        480,
-        SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE
-    );
+            "SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480,
+            SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
     SDL_Log("Creating renderer...");
     sdl::Renderer renderer
-        = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+            = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     SDL_Log("Loading texture...");
 
-    #if defined(__EMSCRIPTEN__)
-        const std::string file("Earth.png");
-    #else
-        if (loop.command_line_args().size() < 2) {
-            SDL_Log("Expected picture for arg 2");
-            return 1;
-        }
-        const std::string file = loop.command_line_args()[1];
-    #endif
+#if defined(__EMSCRIPTEN__)
+    const std::string file("Earth.png");
+#else
+    if (loop.command_line_args().size() < 2) {
+        SDL_Log("Expected picture for arg 2");
+        return 1;
+    }
+    const std::string file = loop.command_line_args()[1];
+#endif
 
     SDL_RWops * ptr = SDL_RWFromFile(file.c_str(), "rb");
     if (!ptr) {
