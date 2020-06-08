@@ -36,7 +36,7 @@ if(NOT "${CMAKE_SYSTEM_NAME}" MATCHES "Emscripten")
     # when test_package tries to use the installed config file, it will call
     # `find_package(sdl2)` and pull in a version which only has the target
     # `sdl2::sdl2`!
-    find_package(sdl2 2.0.9 MODULE REQUIRED)
+    find_package(SDL2 2.0.9 CONFIG REQUIRED)
 endif()
 
 add_library(
@@ -74,11 +74,11 @@ endif()
 # https://docs.conan.io/en/latest/integrations/build_system/cmake/find_packages.html
 # https://www.reddit.com/r/cpp/comments/bsjr6r/how_to_nonintrusively_try_the_conan_package/
 if(NOT "${CMAKE_SYSTEM_NAME}" MATCHES "Emscripten")
-    if (TARGET sdl2::sdl2)
-        target_link_libraries(lp3_sdl PUBLIC sdl2::sdl2)
-    elseif (TARGET SDL2::SDL2)
+    if (TARGET SDL2::SDL2)
+        set(SDL2_TARGET_NAME "SDL2::SDL2")
         target_link_libraries(lp3_sdl PUBLIC SDL2::SDL2)
     elseif(TARGET SDL2::SDL2-static)
+        set(SDL2_TARGET_NAME "SDL2::SDL2-static")
         target_link_libraries(lp3_sdl PUBLIC SDL2::SDL2-static)
     else()
         message(FATAL_ERROR "Could not find target SDL2::SDL2 or SDL2::SDL2-static!")
@@ -110,12 +110,24 @@ install(
     NAMESPACE lp3::
     DESTINATION lib/cmake/Lp3_Sdl)
 
+set(CONAN_FIND_PACKAGE_MITIGATION_CODE
+    "
+    if (NOT TARGET ${SDL2_TARGET_NAME})
+        add_library(${SDL2_TARGET_NAME} INTERFACE IMPORTED)
+        set_target_properties(${SDL2_TARGET_NAME} PROPERTIES INTERFACE_LINK_LIBRARIES \"sdl2::sdl2\")
+    endif()
+    "
+)
+
 file(
     WRITE "${PROJECT_BINARY_DIR}/Lp3_SdlConfig.cmake"
     "
 include(CMakeFindDependencyMacro)
 if (NOT \"\${CMAKE_SYSTEM_NAME}\" MATCHES \"Emscripten\")
-    find_dependency(sdl2)
+    find_dependency(SDL2)
+    #
+    # hack so both sdl2::sdl2 arae available
+    ${CONAN_FIND_PACKAGE_MITIGATION_CODE}
 endif()
 include(\"\${CMAKE_CURRENT_LIST_DIR}/Lp3_Sdl-targets.cmake\")
 ")
