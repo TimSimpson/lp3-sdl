@@ -36,7 +36,7 @@ if(NOT "${CMAKE_SYSTEM_NAME}" MATCHES "Emscripten")
     # when test_package tries to use the installed config file, it will call
     # `find_package(sdl2)` and pull in a version which only has the target
     # `sdl2::sdl2`!
-    find_package(SDL2 2.0.9 CONFIG REQUIRED)
+    find_package(SDL2 2.0.9 REQUIRED)
 endif()
 
 add_library(
@@ -110,24 +110,19 @@ install(
     NAMESPACE lp3::
     DESTINATION lib/cmake/Lp3_Sdl)
 
-set(CONAN_FIND_PACKAGE_MITIGATION_CODE
-    "
-    if (NOT TARGET ${SDL2_TARGET_NAME})
-        add_library(${SDL2_TARGET_NAME} INTERFACE IMPORTED)
-        set_target_properties(${SDL2_TARGET_NAME} PROPERTIES INTERFACE_LINK_LIBRARIES \"sdl2::sdl2\")
-    endif()
-    "
-)
-
 file(
     WRITE "${PROJECT_BINARY_DIR}/Lp3_SdlConfig.cmake"
     "
 include(CMakeFindDependencyMacro)
 if (NOT \"\${CMAKE_SYSTEM_NAME}\" MATCHES \"Emscripten\")
     find_dependency(SDL2)
-    #
-    # hack so both sdl2::sdl2 arae available
-    ${CONAN_FIND_PACKAGE_MITIGATION_CODE}
+    # I want to develop with the standard target names, but it's possible in a
+    # Conan eco-system that the targets may have nonstandard names. So for now
+    # hack in the standard name if only the nonstandard ones are found.
+    if (NOT TARGET ${SDL2_TARGET_NAME})
+        add_library(${SDL2_TARGET_NAME} INTERFACE IMPORTED)
+        set_target_properties(${SDL2_TARGET_NAME} PROPERTIES INTERFACE_LINK_LIBRARIES \"sdl2::sdl2\")
+    endif()
 endif()
 include(\"\${CMAKE_CURRENT_LIST_DIR}/Lp3_Sdl-targets.cmake\")
 ")
