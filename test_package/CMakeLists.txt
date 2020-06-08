@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 17)
 
 include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 
+# set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
+
 find_package(Lp3_Main CONFIG REQUIRED)
 # ~start-doc cmake-example
 find_package(Lp3_Sdl CONFIG REQUIRED)
@@ -17,6 +19,17 @@ add_executable(Sdl2Simple WIN32 ${CMAKE_CURRENT_SOURCE_DIR}/Sdl2Simple.cpp)
 target_link_libraries(Sdl2Simple PUBLIC lp3::lp3_sdl)
 # ~end-doc cmake-example
 target_link_libraries(Sdl2Simple PUBLIC lp3::lp3_main)
+
+
+# # hack so both sdl2::sdl2 arae avaialble
+# if(TARGET SDL2::SDL2 AND NOT TARGET sdl2::sdl2)
+#     add_library(sdl2::sdl2 INTERFACE IMPORTED)
+#     set_target_properties(sdl2::sdl2 PROPERTIES INTERFACE_LINK_LIBRARIES "SDL2::SDL2")
+# elseif(TARGET SDL2::SDL2-static AND NOT TARGET sdl2::sdl2)
+#     add_library(sdl2::sdl2 INTERFACE IMPORTED)
+#     set_target_properties(sdl2::sdl2 PROPERTIES INTERFACE_LINK_LIBRARIES "SDL2::SDL2-static")
+# endif()
+
 
 
 if (NOT "${CMAKE_SYSTEM_NAME}" MATCHES "Emscripten")
@@ -39,3 +52,6 @@ else()
         "SHELL:--preload-file ${CMAKE_CURRENT_SOURCE_DIR}/media@/"
     )
 endif()
+
+add_executable(Sdl2Simpler WIN32 ${CMAKE_CURRENT_SOURCE_DIR}/Sdl2Simpler.cpp)
+target_link_libraries(Sdl2Simpler PUBLIC lp3::lp3_sdl lp3::lp3_main)
