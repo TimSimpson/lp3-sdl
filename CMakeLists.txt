@@ -115,11 +115,11 @@ file(
     "
 include(CMakeFindDependencyMacro)
 if (NOT \"\${CMAKE_SYSTEM_NAME}\" MATCHES \"Emscripten\")
+    # On Windows, Conan generated Findsdl2.cmake may get used here instead of
+    # the one we want. If that's happened, we can tell because the targets
+    # we need will be missing. So make aliases of the Conan targets instead.
     find_dependency(SDL2)
-    # I want to develop with the standard target names, but it's possible in a
-    # Conan eco-system that the targets may have nonstandard names. So for now
-    # hack in the standard name if only the nonstandard ones are found.
-    if (NOT TARGET ${SDL2_TARGET_NAME})
+    if (NOT TARGET ${SDL2_TARGET_NAME} AND TARGET \"sdl2::sdl2\")
         add_library(${SDL2_TARGET_NAME} INTERFACE IMPORTED)
         set_target_properties(${SDL2_TARGET_NAME} PROPERTIES INTERFACE_LINK_LIBRARIES \"sdl2::sdl2\")
     endif()
