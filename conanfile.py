@@ -6,7 +6,7 @@ import conans
 
 class Lp3Sdl(conans.ConanFile):
     name = "Lp3-Sdl"
-    version = "1.0.2"
+    version = "1.0.3"
     license = "Zlib"
     author = "Tim Simpson"
     url = "https://github.com/TimSimpson/Lp3-Sdl"
