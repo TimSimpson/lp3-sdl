@@ -6,7 +6,7 @@ import conans
 
 class Lp3Sdl(conans.ConanFile):
     name = "Lp3-Sdl"
-    version = "1.0.3"
+    version = "1.0.4"
     license = "Zlib"
     author = "Tim Simpson"
     url = "https://github.com/TimSimpson/Lp3-Sdl"
@@ -46,7 +46,7 @@ class Lp3Sdl(conans.ConanFile):
             for tr in self.test_requires:
                 self.build_requires(tr)
 
-    generators = "cmake_paths", "cmake_find_package"
+    generators = "cmake_find_package"
 
     exports_sources = (
         "src/*", "include/*", "demos/*", "tests/*", "CMakeLists.txt"
@@ -55,7 +55,6 @@ class Lp3Sdl(conans.ConanFile):
     def _configed_cmake(self):
         cmake = conans.CMake(self)
         cmake.configure(defs={
-            "CMAKE_FIND_PACKAGE_PREFER_CONFIG": True,
             "LP3_SDL_Build_Tests": self.tests_enabled,
         })
         return cmake
@@ -72,4 +71,5 @@ class Lp3Sdl(conans.ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.libs = ["lp3_sdl"]
+        self.cpp_info.name = "lp3-sdl"
+        self.cpp_info.libs = ["lp3-sdl"]
