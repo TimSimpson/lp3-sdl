@@ -30,7 +30,7 @@ class Lp3Sdl(conans.ConanFile):
     build_requires = []
 
     test_requires = [
-        "catch2/2.4.1@bincrafters/stable",
+        "Catch2/2.11.1@catchorg/stable",
         "Lp3-Main/1.0.1@TimSimpson/testing",
     ]
 
