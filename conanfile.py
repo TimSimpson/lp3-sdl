@@ -31,7 +31,6 @@ class Lp3Sdl(conans.ConanFile):
 
     test_requires = [
         "Catch2/2.11.1@catchorg/stable",
-        "Lp3-Main/1.0.1@TimSimpson/testing",
     ]
 
     @property

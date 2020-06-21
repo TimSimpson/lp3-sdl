@@ -72,6 +72,41 @@ else()
 endif()
 
 # *********************************************************************
+# Tests and Drivers / Demos
+# *********************************************************************
+
+if(BUILD_TESTING AND LP3_SDL_Build_Tests)
+    find_package(Catch2 REQUIRED)
+
+    function(make_test exe_target)
+        if("${CMAKE_SYSTEM_NAME}" MATCHES "Emscripten")
+            add_test(NAME "test_${exe_target}"
+                     COMMAND node $<TARGET_FILE:${exe_target}>)
+        else()
+            add_test(NAME "test_${exe_target}" COMMAND ${exe_target})
+        endif()
+    endfunction()
+
+    add_executable(sdlrwops_wrapper
+                   ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_sdlrwops_wrapper.cpp)
+    target_link_libraries(sdlrwops_wrapper lp3-sdl Catch2::Catch2)
+    make_test(sdlrwops_wrapper)
+
+endif()
+
+get_directory_property(is_child PARENT_DIRECTORY)
+if(NOT is_child)
+    set(LP3_SDL_FULL True)
+endif()
+
+if(LP3_SDL_FULL)
+    if(LP3_SETUP_FOLDERS)
+        set_target_properties(lp3-sdl PROPERTIES FOLDER lp3-sdl)
+    endif()
+endif()
+
+
+# *********************************************************************
 # Package / Install Stuff
 # *********************************************************************
 
@@ -111,37 +146,3 @@ write_basic_package_version_file(
 install(FILES "${PROJECT_BINARY_DIR}/lp3-sdlConfig.cmake"
               "${PROJECT_BINARY_DIR}/lp3-sdlConfigVersion.cmake"
         DESTINATION lib/cmake/lp3-sdl)
-
-# *********************************************************************
-# Tests and Drivers / Demos
-# *********************************************************************
-
-if(BUILD_TESTING AND LP3_SDL_Build_Tests)
-    find_package(Catch2 REQUIRED)
-
-    function(make_test exe_target)
-        if("${CMAKE_SYSTEM_NAME}" MATCHES "Emscripten")
-            add_test(NAME "test_${exe_target}"
-                     COMMAND node $<TARGET_FILE:${exe_target}>)
-        else()
-            add_test(NAME "test_${exe_target}" COMMAND ${exe_target})
-        endif()
-    endfunction()
-
-    add_executable(sdlrwops_wrapper
-                   ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_sdlrwops_wrapper.cpp)
-    target_link_libraries(sdlrwops_wrapper lp3-sdl Catch2::Catch2)
-    make_test(sdlrwops_wrapper)
-
-endif()
-
-get_directory_property(is_child PARENT_DIRECTORY)
-if(NOT is_child)
-    set(LP3_SDL_FULL True)
-endif()
-
-if(LP3_SDL_FULL)
-    if(LP3_SETUP_FOLDERS)
-        set_target_properties(lp3-sdl PROPERTIES FOLDER lp3-sdl)
-    endif()
-endif()
