@@ -117,7 +117,7 @@ install(FILES "${PROJECT_BINARY_DIR}/lp3-sdlConfig.cmake"
 # *********************************************************************
 
 if(BUILD_TESTING AND LP3_SDL_Build_Tests)
-    find_package(Catch2 CONFIG REQUIRED)
+    find_package(Catch2 REQUIRED)
 
     function(make_test exe_target)
         if("${CMAKE_SYSTEM_NAME}" MATCHES "Emscripten")
