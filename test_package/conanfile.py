@@ -3,14 +3,14 @@ import conans
 
 class TestPackage(conans.ConanFile):
 
-    generators = "cmake_paths", "cmake_find_package"
+    generators = "cmake_find_package"
     settings = "os", "compiler", "build_type", "arch"
 
     requires = (
 # ~end-doc
-         "Lp3-Main/1.0.1@TimSimpson/testing",
+         "Lp3-Main/1.0.5@TimSimpson/testing",
 # ~start-doc
-         "Lp3-Sdl/1.0.1@TimSimpson/testing"
+         "Lp3-Sdl/1.0.4@TimSimpson/testing"
     )
 
     sdl2_requires = (
