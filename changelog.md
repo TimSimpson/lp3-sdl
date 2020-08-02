@@ -1,5 +1,18 @@
 # Change Log
 
+### 1.0.5 2020-08-02
+
+Changes the Conan project name from `Lp3-Sdl` to `lp3-sdl` for consistency.
+
+CMake usage has changed to:
+
+```cmake
+    find_package(lp3-sdl)
+    target_link_libraries(myapp lp3::sdl)
+```
+
+There is a vain attempt to embed `-s USE_SDL=2` as a compile option when the package is used in Emscripten.
+
 ### 1.0.4 2020-06-20
 
 Switched everything to use the `cmake_find_package` generator in Conan exclusively after [because it's not worth it](https://github.com/TimSimpson/lp3-sdl/issues/5). I've now tested the CMake and this project appears to work with both the BinCrafter's SDL2 and vcpkg SDL2 packages, though for my own sanity the later isn't yet tested in CI...

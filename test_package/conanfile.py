@@ -8,9 +8,9 @@ class TestPackage(conans.ConanFile):
 
     requires = (
 # ~end-doc
-         "Lp3-Main/1.0.5@TimSimpson/testing",
+         "lp3-main/1.0.7@TimSimpson/testing",
 # ~start-doc
-         "Lp3-Sdl/1.0.4@TimSimpson/testing"
+         "lp3-sdl/1.0.5@TimSimpson/testing"
     )
 
     sdl2_requires = (

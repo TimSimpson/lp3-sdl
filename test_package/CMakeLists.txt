@@ -12,9 +12,9 @@ add_executable(Sdl2Simple WIN32 ${CMAKE_CURRENT_SOURCE_DIR}/Sdl2Simple.cpp)
 # Associate lp3_sdl as a dependency. Pulls in SDL2 and SDL2 image libraries
 # from BinCrafters. For Emscripten builds, adds appropriate compile and link
 # options to include built-in SDL2 support.
-target_link_libraries(Sdl2Simple PUBLIC lp3-sdl::lp3-sdl)
+target_link_libraries(Sdl2Simple PUBLIC lp3::sdl)
 # ~end-doc cmake-example
-target_link_libraries(Sdl2Simple PUBLIC lp3-main::lp3-main)
+target_link_libraries(Sdl2Simple PUBLIC lp3::main)
 
 
 if (NOT "${CMAKE_SYSTEM_NAME}" MATCHES "Emscripten")

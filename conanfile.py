@@ -5,11 +5,11 @@ import conans
 
 
 class Lp3Sdl(conans.ConanFile):
-    name = "Lp3-Sdl"
-    version = "1.0.4"
+    name = "lp3-sdl"
+    version = "1.0.5"
     license = "Zlib"
     author = "Tim Simpson"
-    url = "https://github.com/TimSimpson/Lp3-Sdl"
+    url = "https://github.com/TimSimpson/lp3-sdl"
     description = "some C++ wrappers for SDL2, used by me"
 
     settings = "os", "compiler", "build_type", "arch"
@@ -23,6 +23,8 @@ class Lp3Sdl(conans.ConanFile):
     )
 
     def requirements(self):
+        # don't require SDL2 on Emscripten since that platform bundles the
+        # libraries.
         if self.settings.os != "Emscripten":
             for r in self.sdl2_requires:
                 self.requires.add(r)
@@ -48,7 +50,7 @@ class Lp3Sdl(conans.ConanFile):
     generators = "cmake_find_package"
 
     exports_sources = (
-        "src/*", "include/*", "demos/*", "tests/*", "CMakeLists.txt"
+        "src/*", "include/*", "demos/*", "tests/*", "CMakeLists.txt", "cmake/*",
     )
 
     def _configed_cmake(self):
@@ -70,5 +72,20 @@ class Lp3Sdl(conans.ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.name = "lp3-sdl"
-        self.cpp_info.libs = ["lp3-sdl"]
+        _set_for_cmake(self.cpp_info.names, "lp3")
+        _set_for_cmake(self.cpp_info.filenames, "lp3-sdl")
+        _set_for_cmake(self.cpp_info.components['sdl'].names, "sdl")
+        self.cpp_info.components['sdl'].libs = [ "lp3-sdl" ]
+        self.cpp_info.components['sdl'].build_modules = [
+            os.path.join(
+                self.package_folder,
+                "lib/cmake/lp3-sdl/ConanFindModuleExtra.cmake"
+            )
+        ]
+        if self.settings.os != "Emscripten":
+            self.cpp_info.components['sdl'].requires = [ "sdl2::sdl2" ]
+
+
+def _set_for_cmake(attr, value):
+    for generator in ['cmake_find_package', 'cmake_find_package_multi']:
+        attr[generator] = value

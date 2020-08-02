@@ -19,14 +19,14 @@ option(LP3_SDL_Build_Tests "Build tests when BUILD_TESTING is enabled."
 
 if(NOT "${CMAKE_SYSTEM_NAME}" MATCHES "Emscripten")
     find_package(SDL2)
-    if (TARGET SDL2::SDL2-static)
+    if(TARGET SDL2::SDL2-static)
         set(SDL2_TARGET SDL2::SDL2-static)
-    elseif (TARGET SDL2::SDL2)
+    elseif(TARGET SDL2::SDL2)
         set(SDL2_TARGET SDL2::SDL2)
     else()
         # Try using BinCrafter's find package name from pre 2.0.12 versions.
         find_package(sdl2)
-        if (TARGET sdl2::sdl2)
+        if(TARGET sdl2::sdl2)
             set(SDL2_TARGET sdl2::sdl2)
         else()
             message(FATAL_ERROR "Could not find SDL2!")
@@ -35,17 +35,17 @@ if(NOT "${CMAKE_SYSTEM_NAME}" MATCHES "Emscripten")
 endif()
 
 add_library(
-    lp3-sdl
+    sdl
     ${CMAKE_CURRENT_SOURCE_DIR}/include/lp3/sdl.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/lp3/sdl/config.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl.cpp)
-set_target_properties(lp3-sdl PROPERTIES OUTPUT_NAME "lp3-sdl")
+set_target_properties(sdl PROPERTIES OUTPUT_NAME "lp3-sdl")
 
 # Mandate the use of at least C++17 by everything that uses this
-target_compile_features(lp3-sdl PUBLIC cxx_std_17)
+target_compile_features(sdl PUBLIC cxx_std_17)
 
 target_include_directories(
-    lp3-sdl
+    sdl
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
            $<INSTALL_INTERFACE:include>
     PRIVATE src)
@@ -56,19 +56,19 @@ target_include_directories(
 # of a problem with VS, but now it is, thus the disabled warnings.
 if(BUILD_SHARED_LIBS)
     target_compile_definitions(
-        lp3-sdl
+        sdl
         PUBLIC LP3_SDL_API_DYNAMIC
         PRIVATE LP3_SDL_API_CREATE)
     if(MSVC)
-        target_compile_options(lp3-sdl PRIVATE /wd4251 /wd4275)
+        target_compile_options(sdl PRIVATE /wd4251 /wd4275)
     endif()
 endif()
 
 if(NOT "${CMAKE_SYSTEM_NAME}" MATCHES "Emscripten")
-    target_link_libraries(lp3-sdl PUBLIC "${SDL2_TARGET}")
+    target_link_libraries(sdl PUBLIC "${SDL2_TARGET}")
 else()
-    target_compile_options(lp3-sdl PUBLIC "SHELL:-s USE_SDL=2")
-    target_link_options(lp3-sdl PUBLIC "SHELL:-s USE_SDL=2")
+    target_compile_options(sdl PUBLIC "SHELL:-s USE_SDL=2")
+    target_link_options(sdl PUBLIC "SHELL:-s USE_SDL=2")
 endif()
 
 # *********************************************************************
@@ -89,7 +89,7 @@ if(BUILD_TESTING AND LP3_SDL_Build_Tests)
 
     add_executable(sdlrwops_wrapper
                    ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_sdlrwops_wrapper.cpp)
-    target_link_libraries(sdlrwops_wrapper lp3-sdl Catch2::Catch2)
+    target_link_libraries(sdlrwops_wrapper sdl Catch2::Catch2)
     make_test(sdlrwops_wrapper)
 
 endif()
@@ -101,10 +101,9 @@ endif()
 
 if(LP3_SDL_FULL)
     if(LP3_SETUP_FOLDERS)
-        set_target_properties(lp3-sdl PROPERTIES FOLDER lp3-sdl)
+        set_target_properties(sdl PROPERTIES FOLDER lp3-sdl)
     endif()
 endif()
-
 
 # *********************************************************************
 # Package / Install Stuff
@@ -113,7 +112,7 @@ endif()
 install(DIRECTORY include/ DESTINATION include)
 
 install(
-    TARGETS lp3-sdl
+    TARGETS sdl
     EXPORT lp3-sdl-targets
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
@@ -121,11 +120,11 @@ install(
     INCLUDES
     DESTINATION include)
 
-add_library(lp3::sdl ALIAS lp3-sdl)
+add_library(lp3::sdl ALIAS sdl)
 install(
     EXPORT lp3-sdl-targets
     FILE lp3-sdl-targets.cmake
-    NAMESPACE lp3-sdl::
+    NAMESPACE lp3::
     DESTINATION lib/cmake/lp3-sdl)
 
 file(
@@ -143,6 +142,8 @@ write_basic_package_version_file(
     VERSION 1.0.1
     COMPATIBILITY AnyNewerVersion)
 
-install(FILES "${PROJECT_BINARY_DIR}/lp3-sdlConfig.cmake"
-              "${PROJECT_BINARY_DIR}/lp3-sdlConfigVersion.cmake"
-        DESTINATION lib/cmake/lp3-sdl)
+install(
+    FILES "${PROJECT_BINARY_DIR}/lp3-sdlConfig.cmake"
+          "${PROJECT_BINARY_DIR}/lp3-sdlConfigVersion.cmake"
+          "${CMAKE_CURRENT_SOURCE_DIR}/cmake/ConanFindModuleExtra.cmake"
+    DESTINATION lib/cmake/lp3-sdl)
