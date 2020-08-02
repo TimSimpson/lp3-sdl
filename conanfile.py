@@ -50,7 +50,7 @@ class Lp3Sdl(conans.ConanFile):
     generators = "cmake_find_package"
 
     exports_sources = (
-        "src/*", "include/*", "demos/*", "tests/*", "CMakeLists.txt"
+        "src/*", "include/*", "demos/*", "tests/*", "CMakeLists.txt", "cmake/*",
     )
 
     def _configed_cmake(self):
@@ -72,14 +72,18 @@ class Lp3Sdl(conans.ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.name = "lp3-sdl"
         _set_for_cmake(self.cpp_info.names, "lp3")
         _set_for_cmake(self.cpp_info.filenames, "lp3-sdl")
-        # self.cpp_info.requires = [ "lp3::main" ]
-        # self.cpp_info.names['cmake_find_package'] = "lp3"
         _set_for_cmake(self.cpp_info.components['sdl'].names, "sdl")
         self.cpp_info.components['sdl'].libs = [ "lp3-sdl" ]
-        self.cpp_info.components['sdl'].requires = [ "sdl2::sdl2" ]
+        self.cpp_info.components['sdl'].build_modules = [
+            os.path.join(
+                self.package_folder,
+                "lib/cmake/lp3-sdl/ConanFindModuleExtra.cmake"
+            )
+        ]
+        if self.settings.os != "Emscripten":
+            self.cpp_info.components['sdl'].requires = [ "sdl2::sdl2" ]
 
 
 def _set_for_cmake(attr, value):

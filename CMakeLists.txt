@@ -19,14 +19,14 @@ option(LP3_SDL_Build_Tests "Build tests when BUILD_TESTING is enabled."
 
 if(NOT "${CMAKE_SYSTEM_NAME}" MATCHES "Emscripten")
     find_package(SDL2)
-    if (TARGET SDL2::SDL2-static)
+    if(TARGET SDL2::SDL2-static)
         set(SDL2_TARGET SDL2::SDL2-static)
-    elseif (TARGET SDL2::SDL2)
+    elseif(TARGET SDL2::SDL2)
         set(SDL2_TARGET SDL2::SDL2)
     else()
         # Try using BinCrafter's find package name from pre 2.0.12 versions.
         find_package(sdl2)
-        if (TARGET sdl2::sdl2)
+        if(TARGET sdl2::sdl2)
             set(SDL2_TARGET sdl2::sdl2)
         else()
             message(FATAL_ERROR "Could not find SDL2!")
@@ -105,7 +105,6 @@ if(LP3_SDL_FULL)
     endif()
 endif()
 
-
 # *********************************************************************
 # Package / Install Stuff
 # *********************************************************************
@@ -143,6 +142,8 @@ write_basic_package_version_file(
     VERSION 1.0.1
     COMPATIBILITY AnyNewerVersion)
 
-install(FILES "${PROJECT_BINARY_DIR}/lp3-sdlConfig.cmake"
-              "${PROJECT_BINARY_DIR}/lp3-sdlConfigVersion.cmake"
-        DESTINATION lib/cmake/lp3-sdl)
+install(
+    FILES "${PROJECT_BINARY_DIR}/lp3-sdlConfig.cmake"
+          "${PROJECT_BINARY_DIR}/lp3-sdlConfigVersion.cmake"
+          "${CMAKE_CURRENT_SOURCE_DIR}/cmake/ConanFindModuleExtra.cmake"
+    DESTINATION lib/cmake/lp3-sdl)
