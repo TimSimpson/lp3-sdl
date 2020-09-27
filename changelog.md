@@ -1,5 +1,9 @@
 # Change Log
 
+### 1.0.6 2020-09-16
+
+Allow the use of "basic" SDL2 libraries when the option "use_basic_sdl2cd " is set to True. See [here](https://github.com/TimSimpson/basic-sdl2) for info on basic-sdl2.
+
 ### 1.0.5 2020-08-02
 
 Changes the Conan project name from `Lp3-Sdl` to `lp3-sdl` for consistency.

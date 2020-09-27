@@ -10,7 +10,7 @@ class TestPackage(conans.ConanFile):
 # ~end-doc
          "lp3-main/1.0.7@TimSimpson/testing",
 # ~start-doc
-         "lp3-sdl/1.0.5@TimSimpson/testing"
+         "lp3-sdl/1.0.6@TimSimpson/testing"
     )
 
     sdl2_requires = (

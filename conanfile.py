@@ -6,28 +6,35 @@ import conans
 
 class Lp3Sdl(conans.ConanFile):
     name = "lp3-sdl"
-    version = "1.0.5"
+    version = "1.0.6"
     license = "Zlib"
     author = "Tim Simpson"
     url = "https://github.com/TimSimpson/lp3-sdl"
     description = "some C++ wrappers for SDL2, used by me"
 
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False]}
-    default_options = {"shared": False}
+    options = {
+        "shared": [True, False],
+        "use_basic_sdl2": [True, False],
+    }
+    default_options = {
+        "shared": False,
+        "use_basic_sdl2": False
+    }
 
     requires = tuple()
 
-    sdl2_requires = (
-        "sdl2/2.0.9@bincrafters/stable",
-    )
+    def get_sdl2_dependency(self):
+        if not self.options.use_basic_sdl2:
+            return "sdl2/2.0.9@bincrafters/stable"
+        else:
+            return "sdl2/b_2.0.9@TimSimpson/testing"
 
     def requirements(self):
         # don't require SDL2 on Emscripten since that platform bundles the
         # libraries.
         if self.settings.os != "Emscripten":
-            for r in self.sdl2_requires:
-                self.requires.add(r)
+            self.requires.add(self.get_sdl2_dependency())
 
     build_requires = []
 
@@ -83,7 +90,7 @@ class Lp3Sdl(conans.ConanFile):
             )
         ]
         if self.settings.os != "Emscripten":
-            self.cpp_info.components['sdl'].requires = [ "sdl2::sdl2" ]
+            self.cpp_info.components['sdl'].requires = [ 'sdl2::sdl2' ]
 
 
 def _set_for_cmake(attr, value):

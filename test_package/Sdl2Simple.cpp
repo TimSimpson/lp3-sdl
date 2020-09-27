@@ -12,14 +12,25 @@
 namespace sdl = lp3::sdl;
 
 int _main(lp3::main::PlatformLoop & loop) {
+    SDL_ClearError();
+
     sdl::SDL2 sdl2(SDL_INIT_VIDEO);
+
+    SDL_Log("error initial 0: %s", SDL_GetError());
     IMG_Init(IMG_INIT_PNG);
 
     SDL_Log("Hello SDL!");
 
-    sdl::Window window = SDL_CreateWindow(
+    SDL_Log("error initial 1: %s", SDL_GetError());
+
+    auto * window_ptr = SDL_CreateWindow(
             "SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480,
             SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    if (!window_ptr) {
+        SDL_Log("ERROR!");
+        SDL_Log("error: %s", SDL_GetError());
+    }
+    sdl::Window window = window_ptr;
 
     SDL_Log("Creating renderer...");
     sdl::Renderer renderer
