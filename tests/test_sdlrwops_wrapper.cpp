@@ -8,7 +8,7 @@
 TEST_CASE("RWops read", "[read_a_file]") {
     const std::string text("Hi, how's it going?");
 
-    lp3::sdl::RWops rwops(SDL_RWFromConstMem(text.data(), text.size()));
+    lp3::sdl::RWops rwops(SDL_RWFromConstMem(text.data(), static_cast<int>(text.size())));
 
     {
         char hi[2];
@@ -67,7 +67,7 @@ TEST_CASE("RWops read", "[read_a_file]") {
 TEST_CASE("RWops write", "[write_a_file]") {
     std::string text(40, '*');
 
-    lp3::sdl::RWops rwops(SDL_RWFromMem(text.data(), text.size()));
+    lp3::sdl::RWops rwops(SDL_RWFromMem(text.data(), static_cast<int>(text.size())));
 
     {
         std::string new_text("Good day.");
